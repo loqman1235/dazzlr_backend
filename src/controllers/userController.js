@@ -1,23 +1,7 @@
 import User from "../models/User.js";
-import createDOMPurify from "dompurify";
-import { JSDOM } from "jsdom";
+import sanitizeInput from "../helpers/sanitizeInput.js";
 import { body, validationResult } from "express-validator";
-
-// Sanitize inputs
-const window = new JSDOM("").window;
-const DOMPurify = createDOMPurify(window);
-
-const customConfig = {
-  ALLOWED_TAGS: [], // Empty array to disallow all tags
-  ALLOWED_ATTR: [], // Empty array to disallow all attributes
-};
-
-// Set the custom configuration for DOMPurify
-DOMPurify.setConfig(customConfig);
-
-const sanitizeInput = (val) => {
-  return DOMPurify.sanitize(val);
-};
+import cloudinary from "../utils/cloudinary.js";
 
 const updateUserValidationRules = [
   body("fullname")
@@ -28,16 +12,15 @@ const updateUserValidationRules = [
     })
     .withMessage("Display name can't be empty"),
   body("bio")
+    .optional()
     .trim()
-    .custom((val, { req }) => {
-      return sanitizeInput(val);
-    })
     .custom((val, { req }) => {
       if (val.length > 200) {
         throw new Error("Post content must be max of 200 characters");
       }
       return true;
     }),
+  body("website").optional().trim(),
 ];
 export const getUserByHandler = async (req, res) => {
   try {
@@ -49,8 +32,14 @@ export const getUserByHandler = async (req, res) => {
 
     const user = await User.findOne({ userHandler })
       .populate("posts")
-      .populate("following", "avatar fullname userHandler isVerified")
-      .populate("followers", "avatar fullname userHandler isVerified");
+      .populate(
+        "following",
+        "avatar fullname userHandler isVerified accountType"
+      )
+      .populate(
+        "followers",
+        "avatar fullname userHandler isVerified accountType"
+      );
 
     if (!user) {
       return res
@@ -68,6 +57,28 @@ export const getUserByHandler = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).json(`Error fetching user: ${error}`);
+  }
+};
+
+export const getLoggedInUser = async (req, res) => {
+  try {
+    const { userId } = req.user;
+    if (!userId) {
+      return res.status(400).json({ error: "Logged in user Id is required" });
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const { ipAddress, password, ...userWithoutPassAndIp } = user.toObject();
+
+    res.status(200).json({ user: userWithoutPassAndIp });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json(`Error fetching logged in user: ${error}`);
   }
 };
 
@@ -97,9 +108,11 @@ export const getAllUsers = async (req, res) => {
   }
 };
 
+// Update user
 export const updateUser = async (req, res) => {
   try {
-    const { fullname, bio, country, city } = req.body;
+    const { fullname, bio, userLocation, website } = req.body;
+    const { userId } = req.user;
 
     await Promise.all(updateUserValidationRules.map((rule) => rule.run(req)));
     const validationErrors = validationResult(req);
@@ -111,20 +124,65 @@ export const updateUser = async (req, res) => {
     // Sanitized inputs
     const sanitizedFullname = DOMPurify.sanitize(fullname);
     const sanitizedBio = DOMPurify.sanitize(bio);
-    const sanitizeCountry = DOMPurify.sanitize(country);
-    const sanitizeCity = DOMPurify.sanitize(city);
+    const sanitizeWebsite = DOMPurify.sanitize(website);
+    const sanitizeUserLocation = DOMPurify.sanitize(userLocation);
+
+    let avatarResult;
+    let coverResult;
+    const user = await User.findById(userId);
 
     // If the user changes avatar
     if (req.files.avatar) {
-      console.log(req.files.avatar[0].path);
+      // Remove previous avatar from cloudinary
+      if (user.avatar.public_id) {
+        await cloudinary.uploader.destroy(user.avatar.public_id);
+      }
+      avatarResult = await cloudinary.uploader.upload(
+        req.files.avatar[0].path,
+        { folder: "dazzlr/avatars" }
+      );
     }
+
+    if (req.files.cover) {
+      // Remove previous cover from cloudinary
+      if (user.cover.public_id) {
+        await cloudinary.uploader.destroy(user.cover.public_id);
+      }
+      coverResult = await cloudinary.uploader.upload(req.files.cover[0].path, {
+        folder: "dazzlr/covers",
+      });
+    }
+
+    const updateObject = {
+      fullname: sanitizedFullname,
+      bio: sanitizedBio,
+      userLocation: sanitizeUserLocation,
+      website: sanitizeWebsite,
+    };
+    if (avatarResult) {
+      updateObject.avatar = {
+        public_id: avatarResult?.public_id,
+        url: avatarResult?.secure_url,
+      };
+    }
+
+    if (coverResult) {
+      updateObject.cover = {
+        public_id: coverResult?.public_id,
+        url: coverResult?.secure_url,
+      };
+    }
+    const updatedUser = await User.findByIdAndUpdate(userId, updateObject, {
+      new: true,
+    });
+
+    const { password, ipAddress, ...updatedUserWithoutSensetiveData } =
+      updatedUser.toObject();
 
     res.status(200).json({
       success: true,
-      sanitizedFullname,
-      sanitizedBio,
-      sanitizeCountry,
-      sanitizeCity,
+      message: "Your profile has been successfully saved!",
+      user: updatedUserWithoutSensetiveData,
     });
 
     // console.log(req.files.avatar[0].path);

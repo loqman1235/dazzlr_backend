@@ -4,6 +4,7 @@ import verifyAccessToken from "../middlewares/verifyAccessToken.js";
 import {
   followUser,
   getAllUsers,
+  getLoggedInUser,
   getUserByHandler,
   isUserAlreadyFollowed,
   unfollowUser,
@@ -12,6 +13,8 @@ import {
 
 const router = express.Router();
 router.get("/:userHandler", getUserByHandler);
+router.get("/getLoggedInUser", getLoggedInUser);
+
 router.get("/", getAllUsers);
 // Update user
 router.put(

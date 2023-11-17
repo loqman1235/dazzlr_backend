@@ -7,8 +7,8 @@ const userSchema = new mongoose.Schema(
     userHandler: { type: String, unique: true },
     bio: { type: String, required: false },
     userLocation: {
-      country: { type: String, required: false },
-      city: { type: String, required: false },
+      type: String,
+      required: false,
     },
     website: { type: String, required: false },
     email: { type: String, required: true },
@@ -30,8 +30,13 @@ const userSchema = new mongoose.Schema(
     posts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post" }],
     ipAddress: { type: String, required: false },
     points: { type: Number, required: false, default: 0 },
+    accountType: {
+      type: String,
+      enum: ["personal", "business"],
+      default: "personal",
+      required: false,
+    },
     isVerified: { type: Boolean, required: false, default: false },
-    joinedAt: { type: Date, default: Date.now },
   },
   { timestamps: true }
 );
