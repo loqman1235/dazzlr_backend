@@ -19,7 +19,7 @@ dotenv.config();
 const app = express();
 const httpServer = http.createServer(app);
 const io = new Server(httpServer, {
-  cors: { origin: process.env.FRONTEND_URL },
+  cors: { origin: "*" },
 });
 
 let PORT = process.env.PORT || 3002;
