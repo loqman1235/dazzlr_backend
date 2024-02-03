@@ -89,7 +89,7 @@ export const login = async (req, res) => {
     const { password, ipAddress, posts, ...modifiedUser } =
       existingUser.toObject();
 
-    res.cookie("accessToken", accessToken, { httpOnly: true , secure: true, sameSite: 'None', domain: process.env.FRONTEND_URL});
+    res.cookie("accessToken", accessToken, { httpOnly: true , secure: true, sameSite: 'None', domain: process.env.BACKEND_URL});
     res.status(200).json({
       success: true,
       message: "User logged in successfully",
