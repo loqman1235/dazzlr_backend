@@ -36,6 +36,14 @@ const io = new Server(httpServer, {
     credentials: true,
   },
 });
+
+// Explicitly allow the origin for WebSocket connections
+io.origins([
+  "https://dazzlr-frontend-5dwb.vercel.app",
+  "https://dazzlr-frontend-5dwb-git-main-tonyvito12-gmailcom.vercel.app",
+  "https://dazzlr-frontend-5dwb-pt25f96ss-tonyvito12-gmailcom.vercel.app",
+]);
+
 app.set("io", io);
 
 let onlineUsers = [];
