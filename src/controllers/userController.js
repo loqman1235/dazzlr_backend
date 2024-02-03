@@ -2,6 +2,7 @@ import User from "../models/User.js";
 import sanitizeInput from "../helpers/sanitizeInput.js";
 import { body, validationResult } from "express-validator";
 import cloudinary from "../utils/cloudinary.js";
+import DOMPurify from "dompurify";
 
 const updateUserValidationRules = [
   body("fullname")
