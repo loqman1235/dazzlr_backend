@@ -89,9 +89,6 @@ export const login = async (req, res) => {
     const { password, ipAddress, posts, ...modifiedUser } =
       existingUser.toObject();
 
-      res.header('Access-Control-Allow-Origin', 'https://dazzlr-frontend-5dwb.vercel.app');
-      res.header('Access-Control-Allow-Credentials', true);
-
     res.cookie("accessToken", accessToken, { httpOnly: true });
     res.status(200).json({
       success: true,
