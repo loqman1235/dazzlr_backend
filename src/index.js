@@ -28,7 +28,7 @@ app.use(cookieParser());
 app.use(express.json({ limit: "30mb" }));
 
 const io = new Server(httpServer, {
-  cors: { origin: ["https://dazzlr-frontend-5dwb.vercel.app", "https://dazzlr-frontend-5dwb-git-main-tonyvito12-gmailcom.vercel.app", "https://dazzlr-frontend-5dwb-pt25f96ss-tonyvito12-gmailcom.vercel.app"], credentials: true, methods: ["GET", "POST"], },
+  cors: { origin:  '*'},
 });
 
 app.set("io", io);
