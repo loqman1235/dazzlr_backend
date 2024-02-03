@@ -25,7 +25,7 @@ const io = new Server(httpServer, {
 let PORT = process.env.PORT || 3002;
 
 // Middlewares
-app.use(cors({ credentials: true, origin: process.env.FRONTEND_URL }));
+app.use(cors({ credentials: true, origin: "*"}));
 app.use(cookieParser());
 app.use(express.json({ limit: "30mb" }));
 
@@ -33,19 +33,7 @@ app.set("io", io);
 
 let onlineUsers = [];
 
-/*
 
-    {userId: 'hamed', socketId: 'def456'}
-   
-
-  [
-    {userId: 'Loqman', socketId: 'abc123'},
-    {userId: 'Hamed', socketId: 'def456'},
-    {userId: 'John', socketId: 'ijk789'}
-  ]
-
-
-*/
 
 const addUser = (userId, socketId) => {
   !onlineUsers.some((user) => user.userId === userId) &&
@@ -69,26 +57,7 @@ io.on("connection", (socket) => {
     io.emit("getOnlineUsers", onlineUsers);
   });
 
-  /*
-    {
-      convoId: '123',
-      senderId: 'Loqman', 
-      receiverId: 'Hamed', 
-      message: 'Hello Hamed'
-    }
 
-    // gets user: 
-     {userId: 'Hamed', socketId: 'def456'},
-
-    //  Sending Hamed the message object 
-     {
-      convoId: '123',
-      senderId: 'Loqman', 
-      receiverId: 'Hamed', 
-      message: 'Hello Hamed'
-    }
-
-*/
 
   // Send and get message
   socket.on("sendMessage", ({ convoId, senderId, receiverId, message }) => {
