@@ -18,9 +18,7 @@ import {
 dotenv.config();
 const app = express();
 const httpServer = http.createServer(app);
-const io = new Server(httpServer, {
-  cors: { origin: "https://dazzlr-frontend-5dwb.vercel.app" },
-});
+
 
 let PORT = process.env.PORT || 3002;
 
@@ -29,6 +27,9 @@ app.use(cors({ credentials: true, origin: ["https://dazzlr-frontend-5dwb.vercel.
 app.use(cookieParser());
 app.use(express.json({ limit: "30mb" }));
 
+const io = new Server(httpServer, {
+  cors: { origin: "https://dazzlr-frontend-5dwb.vercel.app" },
+});
 app.set("io", io);
 
 let onlineUsers = [];
