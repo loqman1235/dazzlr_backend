@@ -21,7 +21,7 @@ const httpServer = http.createServer(app);
 
 const io = new Server(httpServer, {
   cors: {
-    origin: "https://obscure-cod-7x7q666r776fxwrw-5173.app.github.dev",
+    origin: process.env.FRONTEND_URL,
   },
 });
 
@@ -32,7 +32,7 @@ let PORT = process.env.PORT || 3002;
 // Middlewares
 app.use(cors({
   credentials: true,
-  origin: "https://obscure-cod-7x7q666r776fxwrw-5173.app.github.dev",
+  origin: process.env.FRONTEND_URL,
 }));
 app.use(cookieParser());
 app.use(express.json({ limit: "30mb" }));
