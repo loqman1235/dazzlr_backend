@@ -19,7 +19,7 @@ dotenv.config();
 const app = express();
 const httpServer = http.createServer(app);
 const io = new Server(httpServer, {
-  cors: { origin: "*" },
+  cors: { origin: "https://dazzlr-frontend-5dwb.vercel.app" },
 });
 
 let PORT = process.env.PORT || 3002;
