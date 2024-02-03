@@ -2,7 +2,6 @@ import User from "../models/User.js";
 import sanitizeInput from "../helpers/sanitizeInput.js";
 import { body, validationResult } from "express-validator";
 import cloudinary from "../utils/cloudinary.js";
-import DOMPurify from "dompurify";
 
 const updateUserValidationRules = [
   body("fullname")
@@ -123,10 +122,10 @@ export const updateUser = async (req, res) => {
     }
 
     // Sanitized inputs
-    const sanitizedFullname = DOMPurify.sanitize(fullname);
-    const sanitizedBio = DOMPurify.sanitize(bio);
-    const sanitizeWebsite = DOMPurify.sanitize(website);
-    const sanitizeUserLocation = DOMPurify.sanitize(userLocation);
+    const sanitizedFullname = sanitizeInput(fullname);
+    const sanitizedBio = sanitizeInput(bio);
+    const sanitizeWebsite = sanitizeInput(website);
+    const sanitizeUserLocation = sanitizeInput(userLocation);
 
     let avatarResult;
     let coverResult;
