@@ -18,18 +18,16 @@ import {
 dotenv.config();
 const app = express();
 const httpServer = http.createServer(app);
-
+const io = new Server(httpServer, {
+  cors: { origin: ["https://dazzlr-frontend-5dwb.vercel.app", "https://dazzlr-frontend-5dwb-git-main-tonyvito12-gmailcom.vercel.app", "https://dazzlr-frontend-5dwb-pt25f96ss-tonyvito12-gmailcom.vercel.app"] },
+});
 
 let PORT = process.env.PORT || 3002;
 
 // Middlewares
-app.use(cors({ credentials: true, origin: ["https://dazzlr-frontend-5dwb.vercel.app", "https://dazzlr-frontend-5dwb-git-main-tonyvito12-gmailcom.vercel.app", "https://dazzlr-frontend-5dwb-pt25f96ss-tonyvito12-gmailcom.vercel.app"],  allowedHeaders: ["Authorization", "Content-Type"],}));
+app.use(cors({ credentials: true, origin: ["https://dazzlr-frontend-5dwb.vercel.app", "https://dazzlr-frontend-5dwb-git-main-tonyvito12-gmailcom.vercel.app", "https://dazzlr-frontend-5dwb-pt25f96ss-tonyvito12-gmailcom.vercel.app"]}));
 app.use(cookieParser());
 app.use(express.json({ limit: "30mb" }));
-
-const io = new Server(httpServer, {
-  cors: { origin:  '*'},
-});
 
 app.set("io", io);
 
