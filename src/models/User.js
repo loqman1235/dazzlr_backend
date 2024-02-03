@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema(
       url: {
         type: String,
         required: false,
-        default: "http://localhost:5173/Avatar.svg",
+        default: `${process.env.FRONTEND_URL}/Avatar.svg`,
       },
     },
     cover: {
