@@ -25,7 +25,7 @@ const io = new Server(httpServer, {
 let PORT = process.env.PORT || 3002;
 
 // Middlewares
-app.use(cors({ credentials: true, origin: process.env.FRONTEND_URL}));
+app.use(cors({ credentials: true, origin: "*"}));
 app.use(cookieParser());
 app.use(express.json({ limit: "30mb" }));
 
