@@ -89,7 +89,7 @@ export const login = async (req, res) => {
     const { password, ipAddress, posts, ...modifiedUser } =
       existingUser.toObject();
 
-    res.cookie("accessToken", accessToken, { httpOnly: true });
+    res.cookie("accessToken", accessToken, { httpOnly: true , secure: true, sameSite: 'None'});
     res.status(200).json({
       success: true,
       message: "User logged in successfully",
